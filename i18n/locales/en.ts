@@ -35,6 +35,18 @@ const en = {
             "commercial": "Shops & Cafes"
         }
     },
+    "geography": {
+        "title": "International Targeting (Optional)",
+        "description": "Select your primary region to optimize spelling (US vs UK) and trends.",
+        "placeholder": "Select a region...",
+        "options": {
+            "us": "US Audience",
+            "europe": "European Audience",
+            "south_america": "South America",
+            "asia": "Asian Audience",
+            "north_africa": "North African Audience"
+        }
+    },
     "seasonalKeywords": {
       "button": "Suggest Seasonal Keywords",
       "loading": "Finding trends...",

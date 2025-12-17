@@ -12,17 +12,30 @@ const INTENT_PROMPTS: Record<string, string> = {
   commercial: "Target Audience: Shops, cafes, and physical retail spaces. Focus on durability, customer appeal, display value, and commercial utility. Tone: Business-oriented, practical, and inviting."
 };
 
-export async function generateListing(productDescription: string, priorityKeyword?: string, purchaseIntent?: string): Promise<ListingData> {
+const GEOGRAPHY_PROMPTS: Record<string, string> = {
+  us: "Target Market: United States. STRICTLY use American English spelling (e.g., 'Color', 'Jewelry', 'Personalized'). Focus on US holidays and trends. Use Imperial units (inches) primarily.",
+  europe: "Target Market: Europe. STRICTLY use British/European English spelling (e.g., 'Colour', 'Jewellery', 'Personalised'). Focus on EU trends. Use Metric units (cm) primarily.",
+  south_america: "Target Market: South America. Focus on trends relevant to LATAM. While the listing is in English, consider cultural relevance. Use Metric units (cm).",
+  asia: "Target Market: Asia. Focus on trends popular in Asian markets (e.g., specific aesthetic styles like minimalism or kawaii depending on product). Use Metric units (cm).",
+  north_africa: "Target Market: North Africa. Focus on cultural relevance for the MENA region while keeping the listing in English. Use Metric units (cm)."
+};
+
+export async function generateListing(productDescription: string, priorityKeyword?: string, purchaseIntent?: string, geography?: string): Promise<ListingData> {
   const intentInstruction = purchaseIntent && INTENT_PROMPTS[purchaseIntent] 
-    ? `\n    ${INTENT_PROMPTS[purchaseIntent]}\n` 
+    ? `\n    ${INTENT_PROMPTS[purchaseIntent]}` 
+    : '';
+
+  const geographyInstruction = geography && GEOGRAPHY_PROMPTS[geography]
+    ? `\n    ${GEOGRAPHY_PROMPTS[geography]}`
     : '';
 
   const prompt = `
-    You are an expert Etsy SEO and marketing specialist. Your target audience is professional Etsy sellers in the US and European markets.
+    You are an expert Etsy SEO and marketing specialist. Your target audience is professional Etsy sellers.
     Using real-time search data from Google, find the best keywords that customers are currently using to search for a product like this: "${productDescription}".
     
     ${priorityKeyword ? `A priority keyword has been provided: "${priorityKeyword}". You MUST place this exact keyword at the very beginning of the generated title.` : ''}
     ${intentInstruction}
+    ${geographyInstruction}
 
     Generate a complete, SEO-optimized Etsy product listing based on your findings.
 
@@ -65,7 +78,7 @@ export async function generateListing(productDescription: string, priorityKeywor
       - Readability: MAXIMIZE WHITE SPACE. One point per line. No walls of text.
       - Strategy: Naturally integrate the top search queries (keywords) provided.
       - Call to Action: End with a clear, persuasive Call to Action (CTA) encouraging the purchase (e.g., "🛒 Add to cart now!") on its own line with an emoji.
-      - **Targeting**: tailor the language, benefits, and use cases specifically to the defined target audience if one was provided.
+      - **Targeting**: tailor the language, benefits, and use cases specifically to the defined target audience and geography if provided.
     - Keywords: Exactly 13 keyword objects.
       - STRATEGY: You MUST utilize all 13 keyword tags. Diversify them strictly across these 3 categories to maximize search reach:
         1. **Technical/Descriptive**: Specifics about the item, materials, style (e.g., "linen dress", "abstract print").

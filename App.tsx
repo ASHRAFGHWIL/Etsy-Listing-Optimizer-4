@@ -139,6 +139,7 @@ const App: React.FC = () => {
   const [productDescription, setProductDescription] = useState('');
   const [priorityKeyword, setPriorityKeyword] = useState('');
   const [purchaseIntent, setPurchaseIntent] = useState('');
+  const [geography, setGeography] = useState('');
   const [listingData, setListingData] = useState<ListingData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -322,8 +323,8 @@ const App: React.FC = () => {
     setImageUrlInput('');
     setKeywordFilter('All');
     try {
-      // Pass purchaseIntent to the service function
-      const data = await generateListing(productDescription, priorityKeyword, purchaseIntent);
+      // Pass purchaseIntent and geography to the service function
+      const data = await generateListing(productDescription, priorityKeyword, purchaseIntent, geography);
       setListingData(data);
 
       setIsGeneratingTitles(true);
@@ -728,7 +729,7 @@ const App: React.FC = () => {
                 aria-label={t('form.title')}
             />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 <div>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">{t('form.priorityKeyword.title')}</h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{t('form.priorityKeyword.description')}</p>
@@ -784,6 +785,31 @@ const App: React.FC = () => {
                             <option value="children">{t('form.intent.options.children')}</option>
                             <option value="home_decor">{t('form.intent.options.home_decor')}</option>
                             <option value="commercial">{t('form.intent.options.commercial')}</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none ltr:right-0 rtl:left-0 rtl:right-auto">
+                            <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">{t('form.geography.title')}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{t('form.geography.description')}</p>
+                    <div className="relative">
+                        <select
+                            value={geography}
+                            onChange={(e) => setGeography(e.target.value)}
+                            className="w-full p-3 bg-slate-100 dark:bg-gray-700 rounded-lg border-2 border-transparent focus:ring-2 focus:ring-primary focus:border-primary transition duration-200 appearance-none cursor-pointer"
+                            aria-label={t('form.geography.title')}
+                        >
+                            <option value="">{t('form.geography.placeholder')}</option>
+                            <option value="us">{t('form.geography.options.us')}</option>
+                            <option value="europe">{t('form.geography.options.europe')}</option>
+                            <option value="south_america">{t('form.geography.options.south_america')}</option>
+                            <option value="asia">{t('form.geography.options.asia')}</option>
+                            <option value="north_africa">{t('form.geography.options.north_africa')}</option>
                         </select>
                         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none ltr:right-0 rtl:left-0 rtl:right-auto">
                             <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
