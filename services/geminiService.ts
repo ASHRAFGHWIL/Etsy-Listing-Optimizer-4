@@ -3,12 +3,26 @@ import { ListingData, Keyword } from '../types';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
-export async function generateListing(productDescription: string, priorityKeyword?: string): Promise<ListingData> {
+const INTENT_PROMPTS: Record<string, string> = {
+  professionals: "Target Audience: Professionals and large business owners. Focus on scalability, high quality, efficiency, and commercial value. Tone: Professional, authoritative, and premium.",
+  beginners: "Target Audience: Beginners and small business owners. Focus on ease of use, starter-friendly features, and growth potential. Tone: Encouraging, accessible, and clear.",
+  handicrafts: "Target Audience: Small handicraft makers and DIY artisans. Focus on creativity, uniqueness, craft supplies, and handmade quality. Tone: Creative, inspiring, and supportive.",
+  children: "Target Audience: Children's rooms and parents. Focus on safety, playfulness, education, and whimsical design. Tone: Fun, gentle, and family-oriented.",
+  home_decor: "Target Audience: Home decor enthusiasts and interior styling. Focus on aesthetics, trends, atmosphere, and style. Tone: Stylish, cozy, and aspirational.",
+  commercial: "Target Audience: Shops, cafes, and physical retail spaces. Focus on durability, customer appeal, display value, and commercial utility. Tone: Business-oriented, practical, and inviting."
+};
+
+export async function generateListing(productDescription: string, priorityKeyword?: string, purchaseIntent?: string): Promise<ListingData> {
+  const intentInstruction = purchaseIntent && INTENT_PROMPTS[purchaseIntent] 
+    ? `\n    ${INTENT_PROMPTS[purchaseIntent]}\n` 
+    : '';
+
   const prompt = `
     You are an expert Etsy SEO and marketing specialist. Your target audience is professional Etsy sellers in the US and European markets.
     Using real-time search data from Google, find the best keywords that customers are currently using to search for a product like this: "${productDescription}".
     
     ${priorityKeyword ? `A priority keyword has been provided: "${priorityKeyword}". You MUST place this exact keyword at the very beginning of the generated title.` : ''}
+    ${intentInstruction}
 
     Generate a complete, SEO-optimized Etsy product listing based on your findings.
 
@@ -51,6 +65,7 @@ export async function generateListing(productDescription: string, priorityKeywor
       - Readability: MAXIMIZE WHITE SPACE. One point per line. No walls of text.
       - Strategy: Naturally integrate the top search queries (keywords) provided.
       - Call to Action: End with a clear, persuasive Call to Action (CTA) encouraging the purchase (e.g., "🛒 Add to cart now!") on its own line with an emoji.
+      - **Targeting**: tailor the language, benefits, and use cases specifically to the defined target audience if one was provided.
     - Keywords: Exactly 13 keyword objects.
       - STRATEGY: You MUST utilize all 13 keyword tags. Diversify them strictly across these 3 categories to maximize search reach:
         1. **Technical/Descriptive**: Specifics about the item, materials, style (e.g., "linen dress", "abstract print").

@@ -22,6 +22,19 @@ const en = {
       "description": "Enter one high-impact keyword to place at the beginning of your title. This is often the most searched term for your product.",
       "placeholder": "e.g., Personalized Gift"
     },
+    "intent": {
+        "title": "Purchase Intent / Target Audience (Optional)",
+        "description": "Select who this product is primarily designed for to tailor the SEO and description tone.",
+        "placeholder": "Select an audience...",
+        "options": {
+            "professionals": "Professionals & Large Business Owners",
+            "beginners": "Beginners & Small Business Owners",
+            "handicrafts": "Small Handicrafts & DIY Makers",
+            "children": "Children's Rooms",
+            "home_decor": "Home Decor Enthusiasts",
+            "commercial": "Shops & Cafes"
+        }
+    },
     "seasonalKeywords": {
       "button": "Suggest Seasonal Keywords",
       "loading": "Finding trends...",

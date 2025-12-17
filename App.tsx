@@ -138,6 +138,7 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [productDescription, setProductDescription] = useState('');
   const [priorityKeyword, setPriorityKeyword] = useState('');
+  const [purchaseIntent, setPurchaseIntent] = useState('');
   const [listingData, setListingData] = useState<ListingData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -321,7 +322,8 @@ const App: React.FC = () => {
     setImageUrlInput('');
     setKeywordFilter('All');
     try {
-      const data = await generateListing(productDescription, priorityKeyword);
+      // Pass purchaseIntent to the service function
+      const data = await generateListing(productDescription, priorityKeyword, purchaseIntent);
       setListingData(data);
 
       setIsGeneratingTitles(true);
@@ -726,44 +728,69 @@ const App: React.FC = () => {
                 aria-label={t('form.title')}
             />
             
-            <div className="mt-6">
-                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">{t('form.priorityKeyword.title')}</h3>
-                <p className="text-slate-500 dark:text-slate-400 mb-4">{t('form.priorityKeyword.description')}</p>
-                <input
-                    type="text"
-                    value={priorityKeyword}
-                    onChange={(e) => setPriorityKeyword(e.target.value)}
-                    placeholder={t('form.priorityKeyword.placeholder')}
-                    className="w-full md:w-1/2 p-3 bg-slate-100 dark:bg-gray-700 rounded-lg border-2 border-transparent focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
-                    aria-label={t('form.priorityKeyword.title')}
-                />
-                
-                <div className="mt-4">
-                  <div className="flex items-center flex-wrap gap-2">
-                    <button
-                      onClick={handleGenerateSeasonalKeywords}
-                      disabled={isGeneratingSeasonal || !productDescription.trim()}
-                      className="text-sm font-medium text-secondary-dark dark:text-secondary-light flex items-center hover:underline disabled:opacity-50 disabled:no-underline"
-                    >
-                      <SparklesIcon className={`w-4 h-4 mr-1 ${isGeneratingSeasonal ? 'animate-spin' : ''}`} />
-                      {isGeneratingSeasonal ? t('form.seasonalKeywords.loading') : t('form.seasonalKeywords.button')}
-                    </button>
-                    <span className="text-xs text-slate-400">({t('form.seasonalKeywords.description')})</span>
-                  </div>
-                  
-                  {seasonalKeywords.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3 animate-fadeIn">
-                       {seasonalKeywords.map((kw, idx) => (
-                         <button
-                           key={idx}
-                           onClick={() => setPriorityKeyword(kw)}
-                           className="bg-secondary/10 hover:bg-secondary/20 text-secondary-dark dark:text-secondary-light border border-secondary/30 rounded-full px-3 py-1 text-sm transition-colors"
-                         >
-                           {kw}
-                         </button>
-                       ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">{t('form.priorityKeyword.title')}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{t('form.priorityKeyword.description')}</p>
+                    <input
+                        type="text"
+                        value={priorityKeyword}
+                        onChange={(e) => setPriorityKeyword(e.target.value)}
+                        placeholder={t('form.priorityKeyword.placeholder')}
+                        className="w-full p-3 bg-slate-100 dark:bg-gray-700 rounded-lg border-2 border-transparent focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
+                        aria-label={t('form.priorityKeyword.title')}
+                    />
+                    <div className="mt-2">
+                        <div className="flex items-center flex-wrap gap-2">
+                            <button
+                            onClick={handleGenerateSeasonalKeywords}
+                            disabled={isGeneratingSeasonal || !productDescription.trim()}
+                            className="text-sm font-medium text-secondary-dark dark:text-secondary-light flex items-center hover:underline disabled:opacity-50 disabled:no-underline"
+                            >
+                            <SparklesIcon className={`w-4 h-4 mr-1 ${isGeneratingSeasonal ? 'animate-spin' : ''}`} />
+                            {isGeneratingSeasonal ? t('form.seasonalKeywords.loading') : t('form.seasonalKeywords.button')}
+                            </button>
+                        </div>
+                        {seasonalKeywords.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3 animate-fadeIn">
+                            {seasonalKeywords.map((kw, idx) => (
+                                <button
+                                key={idx}
+                                onClick={() => setPriorityKeyword(kw)}
+                                className="bg-secondary/10 hover:bg-secondary/20 text-secondary-dark dark:text-secondary-light border border-secondary/30 rounded-full px-3 py-1 text-sm transition-colors"
+                                >
+                                {kw}
+                                </button>
+                            ))}
+                            </div>
+                        )}
                     </div>
-                  )}
+                </div>
+
+                <div>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">{t('form.intent.title')}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{t('form.intent.description')}</p>
+                    <div className="relative">
+                        <select
+                            value={purchaseIntent}
+                            onChange={(e) => setPurchaseIntent(e.target.value)}
+                            className="w-full p-3 bg-slate-100 dark:bg-gray-700 rounded-lg border-2 border-transparent focus:ring-2 focus:ring-primary focus:border-primary transition duration-200 appearance-none cursor-pointer"
+                            aria-label={t('form.intent.title')}
+                        >
+                            <option value="">{t('form.intent.placeholder')}</option>
+                            <option value="professionals">{t('form.intent.options.professionals')}</option>
+                            <option value="beginners">{t('form.intent.options.beginners')}</option>
+                            <option value="handicrafts">{t('form.intent.options.handicrafts')}</option>
+                            <option value="children">{t('form.intent.options.children')}</option>
+                            <option value="home_decor">{t('form.intent.options.home_decor')}</option>
+                            <option value="commercial">{t('form.intent.options.commercial')}</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none ltr:right-0 rtl:left-0 rtl:right-auto">
+                            <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
